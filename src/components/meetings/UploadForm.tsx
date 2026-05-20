@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Upload, FileAudio, Type, Loader2 } from "lucide-react";
 
 type UploadStatus = "idle" | "uploading" | "transcribing" | "summarizing" | "done" | "error";
