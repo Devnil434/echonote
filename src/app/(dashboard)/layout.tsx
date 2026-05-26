@@ -31,7 +31,7 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden">
+    <div className="flex h-screen bg-background text-foreground overflow-hidden transition-colors duration-300">
       <Sidebar />
       {/* Add left padding on mobile to account for hamburger button */}
       <main className="flex-1 overflow-y-auto pt-16 md:pt-0">

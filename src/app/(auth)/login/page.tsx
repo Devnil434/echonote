@@ -35,10 +35,10 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
-      <Card className="w-full max-w-sm">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4 transition-colors duration-300">
+      <Card className="w-full max-w-sm border-border/40 shadow-xl shadow-primary/5">
         <CardHeader>
-          <CardTitle>Welcome back</CardTitle>
+          <CardTitle className="text-foreground">Welcome back</CardTitle>
           <CardDescription>Sign in to your EchoNote account</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -69,9 +69,9 @@ export default function LoginPage() {
           <Button className="w-full" onClick={handleLogin} disabled={loading}>
             {loading ? "Signing in..." : "Sign In"}
           </Button>
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-muted-foreground">
             No account?{" "}
-            <Link href="/signup" className="text-blue-600 hover:underline">
+            <Link href="/signup" className="text-primary hover:underline">
               Sign up free
             </Link>
           </p>

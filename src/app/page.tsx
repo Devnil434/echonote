@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import {
   Mic, Zap, CheckSquare2, Bell, ArrowRight, Code
 } from "lucide-react";
@@ -12,7 +13,7 @@ const FEATURES = [
     description:
       "Upload MP3, WAV, or M4A recordings up to 25MB. Groq Whisper converts audio to text at 200× realtime speed.",
     color: "text-blue-500",
-    bg:    "bg-blue-50",
+    bg:    "bg-blue-500/10",
   },
   {
     icon: Zap,
@@ -20,7 +21,7 @@ const FEATURES = [
     description:
       "Gemini Flash analyses your transcript and extracts a structured summary, key decisions, and topics.",
     color: "text-violet-500",
-    bg:    "bg-violet-50",
+    bg:    "bg-violet-500/10",
   },
   {
     icon: CheckSquare2,
@@ -28,7 +29,7 @@ const FEATURES = [
     description:
       "Every task, owner, and deadline is pulled from the conversation and stored in a searchable dashboard.",
     color: "text-emerald-500",
-    bg:    "bg-emerald-50",
+    bg:    "bg-emerald-500/10",
   },
   {
     icon: Bell,
@@ -36,23 +37,23 @@ const FEATURES = [
     description:
       "A daily cron agent scans upcoming deadlines and emails reminders before anything slips through the cracks.",
     color: "text-amber-500",
-    bg:    "bg-amber-50",
+    bg:    "bg-amber-500/10",
   },
 ];
 
 const STACK = [
-  "Next.js 14", "TypeScript", "Supabase", "Groq Whisper",
+  "Next.js 16", "TypeScript", "Supabase", "Groq Whisper",
   "Gemini Flash", "Tailwind CSS", "Vercel", "Nodemailer",
 ];
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
       {/* ── Nav ──────────────────────────────────────────── */}
-      <nav className="border-b bg-white/80 backdrop-blur sticky top-0 z-10">
+      <nav className="border-b border-border/40 bg-background/80 backdrop-blur-md sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
-          <span className="font-bold text-slate-900">🎙️ EchoNote</span>
-          <div className="flex items-center gap-3">
+          <span className="font-bold text-foreground">🎙️ EchoNote</span>
+          <div className="flex items-center gap-2">
             <Button asChild variant="ghost" size="sm">
               <a href="https://github.com/Devnil434/echonote" target="_blank" rel="noreferrer">
                 <Code className="h-4 w-4 mr-2" /> GitHub
@@ -64,6 +65,7 @@ export default function LandingPage() {
             <Button asChild size="sm">
               <Link href="/signup">Get Started</Link>
             </Button>
+            <ThemeToggle />
           </div>
         </div>
       </nav>
@@ -74,11 +76,11 @@ export default function LandingPage() {
           <Zap className="h-3 w-3 text-amber-500" />
           Built with Groq Whisper + Gemini Flash
         </Badge>
-        <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 leading-tight mb-5">
+        <h1 className="text-4xl sm:text-5xl font-bold text-foreground leading-tight mb-5">
           Turn meeting recordings into<br />
-          <span className="text-blue-600">structured intelligence</span>
+          <span className="text-primary">structured intelligence</span>
         </h1>
-        <p className="text-lg text-slate-500 mb-8 max-w-2xl mx-auto leading-relaxed">
+        <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
           Upload a recording or paste a transcript. EchoNote generates AI summaries,
           extracts action items with deadlines, and sends you reminder emails —
           automatically.
@@ -98,19 +100,19 @@ export default function LandingPage() {
       </section>
 
       {/* ── Features ──────────────────────────────────────── */}
-      <section className="bg-slate-50 py-16">
+      <section className="bg-muted/40 py-16">
         <div className="max-w-5xl mx-auto px-6">
-          <h2 className="text-2xl font-bold text-slate-900 text-center mb-10">
+          <h2 className="text-2xl font-bold text-foreground text-center mb-10">
             Everything after the meeting, automated
           </h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {FEATURES.map(({ icon: Icon, title, description, color, bg }) => (
-              <div key={title} className="bg-white border rounded-xl p-5">
+              <div key={title} className="bg-card border border-border/40 rounded-xl p-5 hover:shadow-md hover:shadow-primary/5 transition-all duration-300">
                 <div className={`${bg} w-10 h-10 rounded-lg flex items-center justify-center mb-3`}>
                   <Icon className={`h-5 w-5 ${color}`} />
                 </div>
-                <h3 className="font-semibold text-slate-800 mb-1.5">{title}</h3>
-                <p className="text-slate-500 text-xs leading-relaxed">{description}</p>
+                <h3 className="font-semibold text-card-foreground mb-1.5">{title}</h3>
+                <p className="text-muted-foreground text-xs leading-relaxed">{description}</p>
               </div>
             ))}
           </div>
@@ -119,7 +121,7 @@ export default function LandingPage() {
 
       {/* ── How it works ──────────────────────────────────── */}
       <section className="py-16 max-w-3xl mx-auto px-6">
-        <h2 className="text-2xl font-bold text-slate-900 text-center mb-10">
+        <h2 className="text-2xl font-bold text-foreground text-center mb-10">
           How it works
         </h2>
         <div className="space-y-6">
@@ -130,12 +132,12 @@ export default function LandingPage() {
             { step: "04", title: "Get reminded automatically", desc: "A daily cron scans upcoming deadlines and sends targeted email reminders before anything is missed." },
           ].map(({ step, title, desc }) => (
             <div key={step} className="flex gap-5">
-              <div className="text-2xl font-black text-slate-100 w-10 shrink-0 mt-0.5">
+              <div className="text-2xl font-black text-muted/60 dark:text-muted-foreground/20 w-10 shrink-0 mt-0.5 select-none">
                 {step}
               </div>
               <div>
-                <h3 className="font-semibold text-slate-800 mb-1">{title}</h3>
-                <p className="text-slate-500 text-sm leading-relaxed">{desc}</p>
+                <h3 className="font-semibold text-foreground mb-1">{title}</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">{desc}</p>
               </div>
             </div>
           ))}
@@ -143,9 +145,9 @@ export default function LandingPage() {
       </section>
 
       {/* ── Stack ─────────────────────────────────────────── */}
-      <section className="bg-slate-50 py-12">
+      <section className="bg-muted/40 py-12">
         <div className="max-w-3xl mx-auto px-6 text-center">
-          <p className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">
+          <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
             Built with
           </p>
           <div className="flex flex-wrap justify-center gap-2">
@@ -160,21 +162,21 @@ export default function LandingPage() {
 
       {/* ── CTA ───────────────────────────────────────────── */}
       <section className="py-16 text-center px-6">
-        <h2 className="text-2xl font-bold text-slate-900 mb-3">
+        <h2 className="text-2xl font-bold text-foreground mb-3">
           Ready to reclaim your meetings?
         </h2>
-        <p className="text-slate-500 mb-6 text-sm">Free to use. No credit card required.</p>
+        <p className="text-muted-foreground mb-6 text-sm">Free to use. No credit card required.</p>
         <Button asChild size="lg">
           <Link href="/signup">Get started for free →</Link>
         </Button>
       </section>
 
       {/* ── Footer ────────────────────────────────────────── */}
-      <footer className="border-t py-6 text-center text-xs text-slate-400">
+      <footer className="border-t border-border/40 py-6 text-center text-xs text-muted-foreground">
         Built by{" "}
         <a
           href="https://github.com/Devnil434"
-          className="hover:text-slate-600 underline underline-offset-2"
+          className="hover:text-foreground underline underline-offset-2 transition-colors"
           target="_blank"
           rel="noreferrer"
         >
@@ -183,7 +185,7 @@ export default function LandingPage() {
         · Open source on{" "}
         <a
           href="https://github.com/Devnil434/echonote"
-          className="hover:text-slate-600 underline underline-offset-2"
+          className="hover:text-foreground underline underline-offset-2 transition-colors"
           target="_blank"
           rel="noreferrer"
         >

@@ -75,18 +75,18 @@ export default function SignupPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
-        <Card className="w-full max-w-sm text-center p-6 space-y-4">
+      <div className="min-h-screen flex items-center justify-center bg-background px-4 transition-colors duration-300">
+        <Card className="w-full max-w-sm text-center p-6 space-y-4 border-border/40 shadow-xl shadow-primary/5">
           <div>
             <p className="text-2xl mb-2">📬</p>
-            <h2 className="font-semibold text-lg mb-1">Check your email</h2>
-            <p className="text-slate-600 text-sm">
+            <h2 className="font-semibold text-lg mb-1 text-foreground">Check your email</h2>
+            <p className="text-muted-foreground text-sm">
               We sent a confirmation link to <strong>{email}</strong>
             </p>
           </div>
           
-          <div className="pt-4 border-t border-slate-100 space-y-2">
-            <p className="text-xs text-slate-500">
+          <div className="pt-4 border-t border-border/40 space-y-2">
+            <p className="text-xs text-muted-foreground">
               Didn't receive the email?
             </p>
             <Button 
@@ -99,10 +99,10 @@ export default function SignupPage() {
               {resending ? "Sending..." : "Resend confirmation email"}
             </Button>
             {resendSuccess && (
-              <p className="text-xs text-green-600 mt-2">New confirmation link sent!</p>
+              <p className="text-xs text-emerald-500 mt-2">New confirmation link sent!</p>
             )}
             {resendError && (
-              <p className="text-xs text-red-500 mt-2">{resendError}</p>
+              <p className="text-xs text-destructive mt-2">{resendError}</p>
             )}
           </div>
         </Card>
@@ -111,10 +111,10 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
-      <Card className="w-full max-w-sm">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4 transition-colors duration-300">
+      <Card className="w-full max-w-sm border-border/40 shadow-xl shadow-primary/5">
         <CardHeader>
-          <CardTitle>Create your account</CardTitle>
+          <CardTitle className="text-foreground">Create your account</CardTitle>
           <CardDescription>Start capturing meeting intelligence</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -147,15 +147,15 @@ export default function SignupPage() {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          {error && <p className="text-sm text-destructive">{error}</p>}
         </CardContent>
         <CardFooter className="flex-col gap-3">
           <Button className="w-full" onClick={handleSignup} disabled={loading}>
             {loading ? "Creating account..." : "Create Account"}
           </Button>
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-muted-foreground">
             Have an account?{" "}
-            <Link href="/login" className="text-blue-600 hover:underline">
+            <Link href="/login" className="text-primary hover:underline">
               Sign in
             </Link>
           </p>
