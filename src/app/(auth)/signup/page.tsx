@@ -17,6 +17,9 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState(false);
+  const [resendError, setResendError] = useState("");
 
   async function handleSignup() {
     setLoading(true);
@@ -45,15 +48,63 @@ export default function SignupPage() {
     setLoading(false);
   }
 
+  async function handleResend() {
+    setResending(true);
+    setResendError("");
+    setResendSuccess(false);
+
+    const redirectTo = typeof window !== "undefined"
+      ? `${window.location.origin}/auth/callback`
+      : "https://echonote-three.vercel.app/auth/callback";
+
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: {
+        emailRedirectTo: redirectTo,
+      },
+    });
+
+    if (error) {
+      setResendError(error.message);
+    } else {
+      setResendSuccess(true);
+    }
+    setResending(false);
+  }
+
   if (success) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
-        <Card className="w-full max-w-sm text-center p-6">
-          <p className="text-2xl mb-2">📬</p>
-          <h2 className="font-semibold text-lg mb-1">Check your email</h2>
-          <p className="text-slate-600 text-sm">
-            We sent a confirmation link to <strong>{email}</strong>
-          </p>
+        <Card className="w-full max-w-sm text-center p-6 space-y-4">
+          <div>
+            <p className="text-2xl mb-2">📬</p>
+            <h2 className="font-semibold text-lg mb-1">Check your email</h2>
+            <p className="text-slate-600 text-sm">
+              We sent a confirmation link to <strong>{email}</strong>
+            </p>
+          </div>
+          
+          <div className="pt-4 border-t border-slate-100 space-y-2">
+            <p className="text-xs text-slate-500">
+              Didn't receive the email?
+            </p>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="w-full text-xs" 
+              onClick={handleResend} 
+              disabled={resending}
+            >
+              {resending ? "Sending..." : "Resend confirmation email"}
+            </Button>
+            {resendSuccess && (
+              <p className="text-xs text-green-600 mt-2">New confirmation link sent!</p>
+            )}
+            {resendError && (
+              <p className="text-xs text-red-500 mt-2">{resendError}</p>
+            )}
+          </div>
         </Card>
       </div>
     );
