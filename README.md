@@ -1,98 +1,313 @@
-# 🎙️ EchoNote
+# EchoNote 🎙️
 
-EchoNote is a modern AI-powered meeting assistant built with Next.js and Supabase. It transcribes meeting recordings, generates summaries, extracts key highlights, and automatically tracks action items with an integrated email reminder system.
+> AI-powered meeting intelligence for modern teams.  
+> Upload meetings → get transcripts, summaries, action items, and autonomous reminders.
+
+Link: https://echonote-three.vercel.app/
+---
+
+## 🚀 Overview
+
+EchoNote is a production-ready AI SaaS platform that transforms raw meeting recordings into structured, actionable intelligence.
+
+Upload an audio recording or paste a transcript, and EchoNote automatically:
+
+- Transcribes meetings using Groq Whisper
+- Generates AI summaries using Gemini Flash
+- Extracts action items and deadlines
+- Stores searchable meeting history
+- Sends autonomous reminder emails for overdue tasks
+
+Built with a modern full-stack AI architecture using Next.js 14, TypeScript, Supabase, and Vercel.
 
 ---
 
-## 🚀 Key Features
+# ✨ Features
 
-- **AI Transcription & Summarization**: Automatically process meeting audio to extract transcripts and high-level summaries.
-- **Action Item Extraction**: Turn meeting discussions into structured, assignable action items with defined priorities and deadlines.
-- **Email Reminder Engine**: Daily automated email reminders for upcoming deadlines using a connection-optimized Nodemailer transporter.
-- **Snooze & Re-enable Reminders**: Interactive settings dashboard allowing users to track upcoming notifications and re-trigger/snooze sent reminders.
-- **Vercel Cron Integration**: Secure daily automated scanning of action items using authorization token verification.
+## 🎧 Audio Upload & Processing
 
----
-
-## 🛠️ Technology Stack
-
-- **Framework**: [Next.js](https://nextjs.org/) (App Router)
-- **Database & Auth**: [Supabase](https://supabase.com/)
-- **Styling**: Tailwind CSS & Vanilla CSS
-- **Email Delivery**: Nodemailer
-- **Icons**: Lucide React
+- Upload MP3 / WAV / M4A recordings
+- Secure cloud storage with Supabase Storage
+- Real-time processing pipeline
 
 ---
 
-## 📧 Email Reminder System
+## 🤖 AI Meeting Intelligence
 
-The reminder engine triggers daily to notify owners about their upcoming action items due within 24 hours.
-
-### 1. Connection-Optimized SMTP Transporter
-All outbound reminder emails utilize a **Singleton connection pool** located at `src/lib/mailer.ts`. This ensures we reuse the same TCP connection pool across multiple emails triggered during a single cron tick, preventing socket exhaustion.
-
-### 2. Beautiful HTML Templates
-The builder at `src/lib/emailTemplates.ts` formats clean, responsive HTML emails compatible with major clients (Gmail, Apple Mail, Outlook). It features:
-- **Priority banners** colored dynamically by priority level (High: `Red`, Medium: `Amber`, Low: `Slate`).
-- **Overdue warning indicators** if deadlines have already passed.
-- **Direct call-to-action buttons** linking back to the origin meeting in EchoNote.
+- Ultra-fast transcription using Groq Whisper
+- AI-generated executive summaries
+- Key decision extraction
+- Automatic action-item detection
 
 ---
 
-## ⏰ Cron & Dev Endpoints
+## 📌 Task & Reminder System
 
-### Vercel Cron Scheduling
-EchoNote relies on a daily scheduler configured in `vercel.json`:
-- **Path**: `/api/cron/reminders`
-- **Schedule**: `0 8 * * *` (08:00 UTC / 13:30 IST)
+AI extracts:
+- task owner
+- deadlines
+- priorities
 
-#### Security & Authentication
-Vercel automatically signs daily cron requests with a header:
-`Authorization: Bearer <CRON_SECRET>`
+Autonomous reminder agent:
+- scheduled reminders
+- overdue notifications
+- email follow-ups
 
-The reminders API verifies this against your environment variables to block external/unauthorized execution.
+---
 
-### Manual Test Route (Dev-Only)
-For testing during development, you can invoke the cron loop manually without providing authorization headers or waiting for the schedule:
-```bash
-curl http://localhost:3000/api/cron/test
+## 📊 Dashboard Experience
+
+- Searchable meeting history
+- Meeting detail pages
+- Transcript viewer
+- Status tracking
+- Responsive SaaS UI
+
+---
+
+## 🔒 Authentication & Security
+
+- Supabase Authentication
+- Row Level Security (RLS)
+- Protected dashboard routes
+- Secure server-side APIs
+
+---
+
+# 🧠 AI Workflow
+
+```text
+Audio Upload
+    ↓
+Groq Whisper Transcription
+    ↓
+Gemini Flash Summarization
+    ↓
+Structured JSON Extraction
+    ↓
+Action Items + Deadlines
+    ↓
+Dashboard + Reminder Agent
 ```
-*Note: This route is disabled in production environments (`NODE_ENV === "production"`) for safety.*
 
 ---
 
-## ⚙️ Environment Variables
+# 🏗️ Tech Stack
 
-Add the following keys to your `.env.local` configuration:
+| Category | Technology |
+|---|---|
+| Frontend | Next.js 14, React, TypeScript |
+| Styling | Tailwind CSS, shadcn/ui |
+| Backend | Next.js API Routes |
+| Database | Supabase PostgreSQL |
+| Authentication | Supabase Auth |
+| Storage | Supabase Storage |
+| AI Transcription | Groq Whisper |
+| AI Summarization | Gemini Flash |
+| Validation | Zod |
+| Deployment | Vercel |
+| Notifications | Nodemailer |
 
-```bash
-# Supabase Keys
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+---
 
-# Email Server (Gmail App Password)
-GMAIL_USER=your-email@gmail.com
-GMAIL_APP_PASSWORD=xxxx xxxx xxxx xxxx
+# 📂 Architecture
 
-# App and Cron Settings
-CRON_SECRET=your-secret-cron-token
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+```text
+Frontend (Next.js 14)
+        │
+        ▼
+API Routes / Server Actions
+        │
+ ┌───────────────┬────────────────┐
+ ▼               ▼                ▼
+Supabase      Groq Whisper     Gemini Flash
+(DB/Auth)     (Transcription)  (AI Analysis)
+        │
+        ▼
+ Autonomous Reminder Agent
 ```
 
 ---
 
-## 💻 Getting Started
+# ⚡ Core Functionalities
 
-1. **Install Dependencies**:
-   ```bash
-   npm install
-   ```
+## 1. Meeting Upload
 
-2. **Start Dev Server**:
-   ```bash
-   npm run dev
-   ```
+Users can:
+- upload audio recordings
+- paste raw transcripts
+- track processing status
 
-3. **Open local application**:
-   Visit [http://localhost:3000](http://localhost:3000) to view your dashboard.
+---
+
+## 2. AI Summarization
+
+EchoNote generates:
+- executive summaries
+- key discussion points
+- decisions
+- actionable tasks
+
+---
+
+## 3. Autonomous Agent
+
+A cron-based AI reminder system:
+- detects upcoming deadlines
+- sends email reminders
+- tracks completion states
+
+---
+
+# 🔐 Environment Variables
+
+Create `.env.local`
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+
+GROQ_API_KEY=
+GEMINI_API_KEY=
+
+GMAIL_USER=
+GMAIL_APP_PASSWORD=
+
+CRON_SECRET=
+NEXT_PUBLIC_APP_URL=
+```
+
+---
+
+# 🛠️ Local Development
+
+## Clone Repository
+
+```bash
+git clone https://github.com/Devnil434/echonote.git
+cd echonote
+```
+
+---
+
+## Install Dependencies
+
+```bash
+npm install
+```
+
+---
+
+## Run Development Server
+
+```bash
+npm run dev
+```
+
+Open:
+
+```text
+http://localhost:3000
+```
+
+---
+
+# 🗄️ Database Setup
+
+1. Create a project in Supabase
+2. Create a public storage bucket named:
+
+```text
+audio
+```
+
+3. Run the SQL schema in Supabase SQL Editor
+
+---
+
+# 🚀 Deployment
+
+Deploy using Vercel.
+
+```bash
+git push origin main
+```
+
+Vercel automatically deploys the latest version.
+
+---
+
+# 📸 Screenshots
+
+## Landing Page
+
+_Add screenshot here_
+
+---
+
+## Dashboard
+
+_Add screenshot here_
+
+---
+
+## Meeting Detail Page
+
+_Add screenshot here_
+
+---
+
+# 🧩 Future Roadmap
+
+- Semantic search with pgvector
+- AI chat with meetings (RAG)
+- Zoom / Google Meet integrations
+- Team workspaces
+- Slack integration
+- Real-time transcription
+- Meeting analytics dashboard
+
+---
+
+# 📈 Resume Highlights
+
+This project demonstrates:
+
+- Full-stack SaaS architecture
+- AI engineering workflows
+- LLM integration
+- Production deployment
+- Authentication & security
+- Autonomous agents
+- Database design
+- API architecture
+
+---
+
+# 👨‍💻 Author
+
+## Nilanjan Saha
+
+AI/ML & Full-Stack Developer
+
+- GitHub: https://github.com/Devnil434
+- LinkedIn: Add your LinkedIn URL
+
+---
+
+# ⭐ Why EchoNote?
+
+Meetings generate valuable context, but most teams lose it immediately after the call ends.
+
+EchoNote transforms conversations into searchable organizational memory using AI.
+
+---
+
+# 📄 License
+
+MIT License
+
+---
+
+> Built with Next.js 14, Supabase, Groq Whisper, Gemini Flash, and modern AI SaaS architecture.
