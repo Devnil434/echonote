@@ -180,12 +180,12 @@ export function UploadForm() {
 
       {/* Tabs */}
       <Tabs defaultValue="audio">
-        <TabsList className="w-full mb-4">
-          <TabsTrigger value="audio" className="flex-1 gap-2">
-            <FileAudio className="h-4 w-4" /> Upload Audio
+        <TabsList className="w-full mb-4 h-auto">
+          <TabsTrigger value="audio" className="flex-1 gap-2 py-2.5 text-xs sm:text-sm">
+            <FileAudio className="h-4 w-4 shrink-0" /> Upload Audio
           </TabsTrigger>
-          <TabsTrigger value="transcript" className="flex-1 gap-2">
-            <Type className="h-4 w-4" /> Paste Transcript
+          <TabsTrigger value="transcript" className="flex-1 gap-2 py-2.5 text-xs sm:text-sm">
+            <Type className="h-4 w-4 shrink-0" /> Paste Transcript
           </TabsTrigger>
         </TabsList>
 
@@ -195,7 +195,7 @@ export function UploadForm() {
             className="border-2 border-dashed cursor-pointer hover:border-slate-400 transition-colors"
             onClick={() => fileInputRef.current?.click()}
           >
-            <CardContent className="flex flex-col items-center justify-center py-10 gap-3">
+            <CardContent className="flex flex-col items-center justify-center py-12 sm:py-16 gap-3 px-4 text-center">
               <Upload className="h-10 w-10 text-slate-400" />
               {selectedFile ? (
                 <div className="text-center">

@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { ActionItemCard } from "./ActionItemCard";
 import { CheckSquare2, Inbox } from "lucide-react";
 import { toggleActionItemComplete } from "@/actions/meeting.actions";
+import { toast } from "sonner";
 
 interface ActionItem {
   id: string;
@@ -26,15 +27,25 @@ export function ActionItemList({ items }: Props) {
   const [, startTransition] = useTransition();
 
   function handleToggle(itemId: string) {
+    const item = optimisticItems.find((i) => i.id === itemId);
+    if (!item) return;
+
     // Optimistic UI update
     setOptimisticItems((prev) =>
-      prev.map((item) =>
-        item.id === itemId ? { ...item, is_completed: !item.is_completed } : item
+      prev.map((i) =>
+        i.id === itemId ? { ...i, is_completed: !i.is_completed } : i
       )
     );
 
     startTransition(async () => {
-      await toggleActionItemComplete(itemId);
+      try {
+        await toggleActionItemComplete(itemId);
+        toast.success(item.is_completed ? "Marked as open" : "Marked as complete");
+      } catch (err) {
+        // Revert optimistic update
+        setOptimisticItems(items);
+        toast.error("Failed to update — please try again");
+      }
     });
   }
 
