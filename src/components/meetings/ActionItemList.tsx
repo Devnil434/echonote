@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { ActionItemCard } from "./ActionItemCard";
-import { CheckSquare2, Inbox } from "lucide-react";
+import { CheckSquare2 } from "lucide-react";
 import { toggleActionItemComplete } from "@/actions/meeting.actions";
 import { toast } from "sonner";
 
@@ -30,7 +30,6 @@ export function ActionItemList({ items }: Props) {
     const item = optimisticItems.find((i) => i.id === itemId);
     if (!item) return;
 
-    // Optimistic UI update
     setOptimisticItems((prev) =>
       prev.map((i) =>
         i.id === itemId ? { ...i, is_completed: !i.is_completed } : i
@@ -41,8 +40,7 @@ export function ActionItemList({ items }: Props) {
       try {
         await toggleActionItemComplete(itemId);
         toast.success(item.is_completed ? "Marked as open" : "Marked as complete");
-      } catch (err) {
-        // Revert optimistic update
+      } catch {
         setOptimisticItems(items);
         toast.error("Failed to update — please try again");
       }
@@ -51,22 +49,28 @@ export function ActionItemList({ items }: Props) {
 
   if (items.length === 0) {
     return (
-      <div className="text-center py-12 text-slate-400">
-        <Inbox className="h-8 w-8 mx-auto mb-3" />
-        <p className="text-sm">No action items extracted from this meeting</p>
+      <div className="flex flex-col items-center justify-center py-12 text-center px-4">
+        <div className="w-14 h-14 bg-muted rounded-xl flex items-center justify-center mb-4">
+          <CheckSquare2 className="h-7 w-7 text-muted-foreground/40" />
+        </div>
+        <h4 className="heading-sm mb-1">No action items found</h4>
+        <p className="body-sm max-w-xs">
+          The AI didn&apos;t detect any tasks, owners, or deadlines in this transcript.
+          Meetings with clear assignments (&ldquo;X will do Y by Z&rdquo;) generate the best results.
+        </p>
       </div>
     );
   }
 
-  const open = optimisticItems.filter((i) => !i.is_completed);
-  const completed = optimisticItems.filter((i) => i.is_completed);
+  const open      = optimisticItems.filter((i) => !i.is_completed);
+  const completed = optimisticItems.filter((i) =>  i.is_completed);
 
   return (
     <div className="space-y-6">
       {/* ── Open items ────────────────────────────────────── */}
       {open.length > 0 && (
         <div>
-          <h3 className="text-sm font-semibold text-slate-600 mb-3 flex items-center gap-2">
+          <h3 className="text-sm font-semibold text-foreground/70 mb-3 flex items-center gap-2">
             <CheckSquare2 className="h-4 w-4 text-emerald-500" />
             Open ({open.length})
           </h3>
@@ -85,11 +89,11 @@ export function ActionItemList({ items }: Props) {
       {/* ── Completed items ───────────────────────────────── */}
       {completed.length > 0 && (
         <div>
-          <h3 className="text-sm font-semibold text-slate-400 mb-3 flex items-center gap-2">
-            <CheckSquare2 className="h-4 w-4" />
+          <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
+            <CheckSquare2 className="h-4 w-4 text-muted-foreground/50" />
             Completed ({completed.length})
           </h3>
-          <div className="space-y-3 opacity-60">
+          <div className="space-y-3">
             {completed.map((item) => (
               <ActionItemCard
                 key={item.id}

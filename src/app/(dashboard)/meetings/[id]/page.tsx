@@ -6,6 +6,8 @@ import { SummaryPanel } from "@/components/meetings/SummaryPanel";
 import { ActionItemList } from "@/components/meetings/ActionItemList";
 import { TranscriptPanel } from "@/components/meetings/TranscriptPanel";
 import { ProcessingBanner } from "@/components/meetings/ProcessingBanner";
+import { PageTransition } from "@/components/shared/PageTransition";
+import { ErrorAlert } from "@/components/shared/ErrorAlert";
 import { CalendarDays, Clock } from "lucide-react";
 
 export const unstable_instant = false;
@@ -13,11 +15,11 @@ export const unstable_instant = false;
 type Status = "pending" | "processing" | "transcribed" | "done" | "error";
 
 const STATUS_BADGE: Record<Status, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
-  pending:     { label: "Queued",      variant: "secondary" },
-  processing:  { label: "Processing",  variant: "secondary" },
-  transcribed: { label: "Analysing",   variant: "secondary" },
-  done:        { label: "Done",        variant: "default"   },
-  error:       { label: "Failed",      variant: "destructive" },
+  pending:     { label: "Queued",     variant: "secondary"  },
+  processing:  { label: "Processing", variant: "secondary"  },
+  transcribed: { label: "Analysing",  variant: "secondary"  },
+  done:        { label: "Done",       variant: "default"    },
+  error:       { label: "Failed",     variant: "destructive"},
 };
 
 interface Summary {
@@ -50,14 +52,12 @@ export default async function MeetingDetailPage({
 
   const { data: meeting, error } = await supabase
     .from("meetings")
-    .select(
-      `
+    .select(`
       id, title, status, meeting_date, created_at,
       duration_sec, transcript, error_message,
       summaries ( id, content, key_points, decisions, model_used, created_at ),
       action_items ( id, task, owner, deadline, deadline_raw, priority, is_completed, created_at )
-    `
-    )
+    `)
     .eq("id", id)
     .single();
 
@@ -65,14 +65,14 @@ export default async function MeetingDetailPage({
     notFound();
   }
 
-  const summaries = meeting.summaries as unknown as Summary[] | null;
-  const actionItems = (meeting.action_items as unknown as ActionItem[]) ?? [];
-  const summary = summaries?.[0] ?? null;
+  const summaries    = meeting.summaries as unknown as Summary[] | null;
+  const actionItems  = (meeting.action_items as unknown as ActionItem[]) ?? [];
+  const summary      = summaries?.[0] ?? null;
   const statusConfig = STATUS_BADGE[meeting.status as Status] ?? STATUS_BADGE.done;
   const isProcessing = ["pending", "processing", "transcribed"].includes(meeting.status);
 
-  const displayDate = meeting.meeting_date ?? meeting.created_at;
-  const formattedDate = new Date(displayDate).toLocaleDateString("en-US", {
+  const displayDate    = meeting.meeting_date ?? meeting.created_at;
+  const formattedDate  = new Date(displayDate).toLocaleDateString("en-US", {
     weekday: "short", month: "long", day: "numeric", year: "numeric",
   });
 
@@ -80,82 +80,83 @@ export default async function MeetingDetailPage({
     ? `${Math.floor(meeting.duration_sec / 60)}m ${meeting.duration_sec % 60}s`
     : null;
 
+  const openActionCount = actionItems.filter((a) => !a.is_completed).length;
+
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      {/* ── Header ─────────────────────────────────────────── */}
-      <div className="mb-6">
-        <div className="flex items-start justify-between gap-3">
-          <h1 className="text-2xl font-bold text-slate-900 leading-tight">
-            {meeting.title}
-          </h1>
-          <Badge variant={statusConfig.variant} className="shrink-0 mt-1">
-            {statusConfig.label}
-          </Badge>
-        </div>
+    <PageTransition>
+      <div className="p-4 sm:p-6 max-w-4xl mx-auto">
+        {/* ── Header ─────────────────────────────────────────── */}
+        <div className="mb-6">
+          <div className="flex items-start justify-between gap-3">
+            <h1 className="heading-xl leading-tight">{meeting.title}</h1>
+            <Badge variant={statusConfig.variant} className="shrink-0 mt-1">
+              {statusConfig.label}
+            </Badge>
+          </div>
 
-        <div className="flex items-center gap-4 mt-2 text-sm text-slate-500">
-          <span className="flex items-center gap-1.5">
-            <CalendarDays className="h-4 w-4" />
-            {formattedDate}
-          </span>
-          {formattedDuration && (
+          <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-muted-foreground">
             <span className="flex items-center gap-1.5">
-              <Clock className="h-4 w-4" />
-              {formattedDuration}
+              <CalendarDays className="h-4 w-4" />
+              {formattedDate}
             </span>
-          )}
-          {actionItems.length > 0 && (
-            <span className="text-emerald-600 font-medium">
-              {actionItems.filter((a) => !a.is_completed).length} open action{actionItems.length !== 1 ? "s" : ""}
-            </span>
-          )}
+            {formattedDuration && (
+              <span className="flex items-center gap-1.5">
+                <Clock className="h-4 w-4" />
+                {formattedDuration}
+              </span>
+            )}
+            {openActionCount > 0 && (
+              <span className="text-emerald-600 dark:text-emerald-400 font-medium">
+                {openActionCount} open action{openActionCount !== 1 ? "s" : ""}
+              </span>
+            )}
+          </div>
         </div>
+
+        {/* ── Processing banner ──────────────────────────────── */}
+        {isProcessing && (
+          <ProcessingBanner meetingId={meeting.id} currentStatus={meeting.status} />
+        )}
+
+        {/* ── Error banner ───────────────────────────────────── */}
+        {meeting.status === "error" && (
+          <div className="mb-6">
+            <ErrorAlert
+              error={meeting.error_message ?? "Processing failed"}
+            />
+          </div>
+        )}
+
+        {/* ── Tabs ───────────────────────────────────────────── */}
+        {!isProcessing && meeting.status !== "error" && (
+          <Tabs defaultValue="summary">
+            <TabsList className="mb-6 w-full sm:w-auto overflow-x-auto flex-nowrap">
+              <TabsTrigger value="summary">Summary</TabsTrigger>
+              <TabsTrigger value="actions">
+                Action Items
+                {openActionCount > 0 && (
+                  <span className="ml-1.5 bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 text-xs rounded-full px-1.5 py-0.5">
+                    {openActionCount}
+                  </span>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="transcript">Transcript</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="summary" className="animate-fade-in">
+              <SummaryPanel summary={summary} />
+            </TabsContent>
+
+            <TabsContent value="actions" className="animate-fade-in">
+              <ActionItemList items={actionItems} meetingId={meeting.id} />
+            </TabsContent>
+
+            <TabsContent value="transcript" className="animate-fade-in">
+              <TranscriptPanel transcript={meeting.transcript} />
+            </TabsContent>
+          </Tabs>
+        )}
       </div>
-
-      {/* ── Processing banner (auto-polls) ─────────────────── */}
-      {isProcessing && (
-        <ProcessingBanner meetingId={meeting.id} currentStatus={meeting.status} />
-      )}
-
-      {/* ── Error banner ───────────────────────────────────── */}
-      {meeting.status === "error" && (
-        <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-700 font-medium text-sm mb-1">Processing failed</p>
-          <p className="text-red-600 text-xs font-mono">
-            {meeting.error_message ?? "Unknown error"}
-          </p>
-        </div>
-      )}
-
-      {/* ── Tabs ───────────────────────────────────────────── */}
-      {!isProcessing && meeting.status !== "error" && (
-        <Tabs defaultValue="summary">
-          <TabsList className="mb-6">
-            <TabsTrigger value="summary">Summary</TabsTrigger>
-            <TabsTrigger value="actions">
-              Action Items
-              {actionItems.filter((a) => !a.is_completed).length > 0 && (
-                <span className="ml-1.5 bg-emerald-100 text-emerald-700 text-xs rounded-full px-1.5 py-0.5">
-                  {actionItems.filter((a) => !a.is_completed).length}
-                </span>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="transcript">Transcript</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="summary">
-            <SummaryPanel summary={summary} />
-          </TabsContent>
-
-          <TabsContent value="actions">
-            <ActionItemList items={actionItems} meetingId={meeting.id} />
-          </TabsContent>
-
-          <TabsContent value="transcript">
-            <TranscriptPanel transcript={meeting.transcript} />
-          </TabsContent>
-        </Tabs>
-      )}
-    </div>
+    </PageTransition>
   );
 }

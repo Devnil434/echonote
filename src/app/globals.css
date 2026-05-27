@@ -132,3 +132,96 @@
     @apply font-sans;
   }
 }
+
+/* ── Custom animation tokens ──────────────────────────────── */
+@theme inline {
+  --animate-fade-in:  fadeIn 0.2s ease-out;
+  --animate-slide-up: slideUp 0.25s ease-out;
+  --animate-slide-in: slideIn 0.25s ease-out;
+  --animate-shimmer:  shimmer 1.5s infinite;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0);    }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+/* ── Shimmer CSS variables (light + dark) ──────────────────── */
+:root {
+  --shimmer-base: oklch(0.93 0.008 280);
+  --shimmer-peak: oklch(0.98 0.002 280);
+}
+.dark {
+  --shimmer-base: oklch(0.18 0.02 262);
+  --shimmer-peak: oklch(0.23 0.02 262);
+}
+
+/* ── Typography utilities ─────────────────────────────────── */
+@utility heading-xl {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-foreground);
+}
+@utility heading-lg {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--color-foreground);
+}
+@utility heading-md {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  font-weight: 600;
+  color: var(--color-foreground);
+}
+@utility heading-sm {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 600;
+  color: var(--color-foreground);
+}
+@utility body-lg {
+  font-size: 1rem;
+  line-height: 1.625rem;
+  color: var(--color-muted-foreground);
+}
+@utility body-md {
+  font-size: 0.875rem;
+  line-height: 1.625rem;
+  color: var(--color-muted-foreground);
+}
+@utility body-sm {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--color-muted-foreground);
+}
+
+/* ── Shimmer skeleton utility ─────────────────────────────── */
+@utility shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--shimmer-base) 25%,
+    var(--shimmer-peak) 50%,
+    var(--shimmer-base) 75%
+  );
+  background-size: 200% 100%;
+  animation: var(--animate-shimmer);
+}

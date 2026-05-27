@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Loader2 } from "lucide-react";
+import { Check, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-const STATUS_MESSAGES: Record<string, string> = {
-  pending:     "Queued for processing…",
-  processing:  "Transcribing audio with Groq Whisper…",
-  transcribed: "Generating AI summary with Gemini Flash…",
+const ORDERED_STEPS = ["pending", "processing", "transcribed"] as const;
+const STEP_LABELS: Record<string, string> = {
+  pending:     "Queued",
+  processing:  "Transcribing",
+  transcribed: "Summarizing",
 };
 
 interface Props {
@@ -17,12 +19,11 @@ interface Props {
 }
 
 export function ProcessingBanner({ meetingId, currentStatus }: Props) {
-  const router = useRouter();
+  const router   = useRouter();
   const supabase = createClient();
   const [status, setStatus] = useState(currentStatus);
 
   useEffect(() => {
-    // Only poll while still processing
     if (status === "done" || status === "error") return;
 
     const interval = setInterval(async () => {
@@ -33,12 +34,10 @@ export function ProcessingBanner({ meetingId, currentStatus }: Props) {
         .single();
 
       if (!data) return;
-
       setStatus(data.status);
 
       if (data.status === "done" || data.status === "error") {
         clearInterval(interval);
-        // Refresh the server component to load summary + action items
         router.refresh();
       }
     }, 3000);
@@ -48,35 +47,47 @@ export function ProcessingBanner({ meetingId, currentStatus }: Props) {
 
   if (status === "done" || status === "error") return null;
 
+  const currentIdx = ORDERED_STEPS.indexOf(status as (typeof ORDERED_STEPS)[number]);
+
   return (
-    <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-      <div className="flex items-center gap-3">
-        <Loader2 className="h-5 w-5 text-blue-500 animate-spin shrink-0" />
-        <div>
-          <p className="text-blue-700 font-medium text-sm">
-            {STATUS_MESSAGES[status] ?? "Processing…"}
-          </p>
-          <p className="text-blue-500 text-xs mt-0.5">
-            This page will refresh automatically when ready.
-          </p>
-        </div>
+    <div className="mb-6 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/40 rounded-xl p-4">
+      <p className="text-blue-700 dark:text-blue-400 font-medium text-sm mb-3">
+        Processing your meeting…
+      </p>
+
+      <div className="space-y-2.5">
+        {ORDERED_STEPS.map((step, i) => {
+          const isDone   = i < currentIdx;
+          const isActive = i === currentIdx;
+
+          return (
+            <div key={step} className="flex items-center gap-2.5">
+              <div className={cn(
+                "w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-colors duration-200",
+                isDone   ? "bg-blue-400 dark:bg-blue-500" :
+                isActive ? "bg-blue-500 dark:bg-blue-400" :
+                "bg-blue-100 dark:bg-blue-900/50"
+              )}>
+                {isDone   && <Check   className="h-3 w-3 text-white" />}
+                {isActive && <Loader2 className="h-3 w-3 text-white animate-spin" />}
+              </div>
+              <span className={cn(
+                "text-xs transition-colors duration-200",
+                isDone || isActive
+                  ? "text-blue-700 dark:text-blue-400 font-medium"
+                  : "text-blue-300 dark:text-blue-800"
+              )}>
+                {STEP_LABELS[step]}
+                {isActive && <span className="ml-1 animate-pulse">…</span>}
+              </span>
+            </div>
+          );
+        })}
       </div>
 
-      {/* Progress indicator */}
-      <div className="mt-3 flex gap-2">
-        {["pending", "processing", "transcribed"].map((s) => (
-          <div
-            key={s}
-            className={`h-1.5 flex-1 rounded-full transition-colors ${
-              ["pending", "processing", "transcribed"].indexOf(status) >=
-              ["pending", "processing", "transcribed"].indexOf(s)
-                ? "bg-blue-400"
-                : "bg-blue-100"
-            }`}
-          />
-        ))}
-      </div>
+      <p className="text-blue-500 dark:text-blue-500/70 text-xs mt-3">
+        This page will refresh automatically when ready.
+      </p>
     </div>
   );
 }
-
